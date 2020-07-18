@@ -14,7 +14,7 @@ export const newAddress = ({
   navigation,
   token,
 }) => async dispatch => {
-  const token = await AsyncStorage.getItem('@TOKEN')
+  //const token = await AsyncStorage.getItem('@TOKEN')
   const addressData = {
     method: 'POST',
     headers: {
@@ -34,6 +34,7 @@ export const newAddress = ({
   };
   const request = await fetch(`${base_URL}address`, addressData);
   const address = await request.json();
+  console.log('address',address);
   try {
     if (address) {
       dispatch({type: NEWADDRESS, payload: address});

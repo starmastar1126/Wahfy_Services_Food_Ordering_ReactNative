@@ -1,25 +1,65 @@
 import React, { Component } from 'react';
-import { View, Text, Image, StyleSheet } from 'react-native';
+import { View, Text, Image, StyleSheet, Modal, Dimensions, PermissionsAndroid, Alert } from 'react-native';
 import { images } from '../assets';
 import strings from '../strings';
 import { Button } from '../components/common';
 import { colors } from '../constants';
-import Modal, { ModalContent } from 'react-native-modals';
 import Geolocation from '@react-native-community/geolocation';
-import Geocoder from 'react-native-geocoder';
+//import Geocoder from 'react-native-geocoder';
 import AsyncStorage from '@react-native-community/async-storage';
+import MapView from 'react-native-maps';
 
 class Home extends Component {
   state = {
     modalVisible: false,
-    latitude: '37.78825',
-    longitude: '-122.4324',
+    latitude: 0,
+    longitude: 0,
     type: 'ss',
   };
 
 
+  requestLocationPermission = async () => {
+    const checkLocation = await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION
+    );
+
+    if (checkLocation === PermissionsAndroid.RESULTS.GRANTED) {
+
+
+      this.getAddress();
+    } else {
+      try {
+
+        const granted = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+          {
+            title: 'Cool Photo App Camera Permission',
+            message:
+              'Cool Photo App needs access to your camera ' +
+              'so you can take awesome pictures.',
+            buttonNeutral: 'Ask Me Later',
+            buttonNegative: 'Cancel',
+            buttonPositive: 'OK',
+          },
+        );
+        if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+          this.getAddress();
+        } else {
+          console.log('Camera permission denied');
+        }
+      } catch (err) {
+        console.warn(err);
+      }
+    }
+
+  }
+
+  componentDidMount = () => {
+    this.requestLocationPermission();
+  }
+
   getAddress() {
     Geolocation.getCurrentPosition(async position => {
+      
       const latitude = position.coords.latitude;
       const longitude = position.coords.longitude;
       this.setState({ latitude, longitude });
@@ -30,11 +70,11 @@ class Home extends Component {
         ',' +
         this.state.longitude +
         '&key=' +
-        'AIzaSyBb0Rk4lIS1MXvMtqoOEhTnj0dFoQEuXO0',
+        'AIzaSyCrE37VwfRoP6qvTzPcmsDfCyVyhDbKf9s',
       );
       // console.log(response);
       const result = await response.json();
-      // console.log(result);
+      console.log(result);
 
       //   Geocoder.geocodePosition(
       //     position.coords.latitude,
@@ -47,44 +87,70 @@ class Home extends Component {
     });
   }
 
+  useMyLocationButtonPressed = () => {
+    this.setState({ modalVisible: false });
+    this.getAddress();
+  }
+
+  editButtonPressed = () => {
+    const { navigation } = this.props;
+
+    this.setState({ modalVisible: false });
+    navigation.navigate('MyAddresses');
+  }
+
   render() {
     const { modalVisible, type } = this.state;
     const {
       imageStyle,
       deliveryButton,
       takeAwayButton,
+      mapView,
       modalButtonsContainer,
       useAddressBtn,
       editBtn,
+      contanierView,
+      contentView
     } = styles;
+    const { latitude, longitude } = this.state;
     const { navigation } = this.props;
     return (
       <View style={{ flex: 1, alignItems: 'center' }}>
+        <Modal visible={modalVisible} transparent
+        onRequestClose={()=>console.log('close')}>
+          <View style={contanierView}>
+            {(latitude) ? <MapView style={mapView} initialRegion={{
+              latitude,
+              longitude,
+              latitudeDelta: 0.3,
+              longitudeDelta: 0.3,
+            }} /> : <View />}
+
+            <View style={modalButtonsContainer}>
+              <Button
+                title={strings.useThisAddress}
+                buttonStyle={useAddressBtn}
+                onPress={this.useMyLocationButtonPressed}
+              />
+              <Button
+                title={strings.edit}
+                buttonStyle={editBtn}
+                onPress={this.editButtonPressed}
+              />
+            </View>
+          </View>
+        </Modal>
         {/* modal section */}
-        <Modal
+        {/* <Modal
           visible={modalVisible}
+          
           onTouchOutside={() => {
             this.setState({ modalVisible: false });
           }}>
           <ModalContent style={modalButtonsContainer}>
-            <Button
-              title={strings.useThisAddress}
-              buttonStyle={useAddressBtn}
-              onPress={() => {
-                this.setState({ modalVisible: false });
-                this.getAddress();
-              }}
-            />
-            <Button
-              title={strings.edit}
-              buttonStyle={editBtn}
-              onPress={() => {
-                this.setState({ modalVisible: false });
-                navigation.navigate('MyAddresses');
-              }}
-            />
+            
           </ModalContent>
-        </Modal>
+        </Modal> */}
 
         <Image source={images.food_1} style={imageStyle} />
         <View style={{ marginTop: 50, alignItems: 'center' }}>
@@ -110,6 +176,7 @@ class Home extends Component {
   }
 }
 
+const { width, height } = Dimensions.get('window');
 const styles = StyleSheet.create({
   imageStyle: {
     width: '100%',
@@ -134,6 +201,8 @@ const styles = StyleSheet.create({
     height: 250,
     alignItems: 'center',
     justifyContent: 'center',
+    backgroundColor: "#ffffff",
+    borderRadius: 10
   },
   useAddressBtn: {
     width: '80%',
@@ -144,6 +213,17 @@ const styles = StyleSheet.create({
     backgroundColor: 'green',
     marginTop: 15,
   },
+  contanierView: {
+    backgroundColor: "#00000033",
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  mapView: {
+    position: 'absolute',
+    height,
+    width
+  }
 });
 
 export default Home;

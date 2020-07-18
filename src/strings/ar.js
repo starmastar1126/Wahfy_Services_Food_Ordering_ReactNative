@@ -31,16 +31,20 @@ export default ar = {
   
     //screens name
     login: 'تسجيل الدخول',
+    backToLogin:'العودة إلي تسجيل الدخول',
     signup: 'التسجيل',
     verifyingNumber: 'VerifyingNumber',
-    phoneVerification: 'Phone Verification',
+    phoneVerification: 'تحقق البريد الإلكتروني',
+    gotohome:'الذهاب الي الصفحة الرئيسية',
     home: 'الرئيسية',
     addAddress: 'إضافة عنوان',
     cart: 'السلة',
     editAddress: 'تعديل العنوان',
+    editProfile: 'تعديل الحساب',
     menu: 'القائمة',
     myAddresses: 'عناويني',
     myOrders: 'طلباتي',
+    orderDetails: 'تفاصيل طلباتي',
     offers: 'العروض',
     productDetails: 'تفاصيل المنتج',
     branches: 'الفروع',
@@ -57,12 +61,19 @@ export default ar = {
   
     //Intro screen
     facebook: 'Facebook',
+    google: 'Google',
   
     //login screen
     welcomeBack: 'أهلا بعودتك',
     loginToAccount: 'سجل لحسابك',
     forgetPassword: 'نسيت كلمة السر؟',
     dontHaveAccount: 'ليس لديك حساب؟',
+    send: 'إرسال',
+    alertsend:"يرجى التحقق من بريدك الإلكتروني لإعادة تعيين كلمة المرور",
+    errorMailmodal:"لا يمكننا العثور على مستخدم يحمل عنوان البريد الإلكتروني",
+
+    //Reset Password
+    resetPassword:'إعادة تعيين كلمة السر',
   
     //signup screen
     createAccount: 'إنشاء حساب',
@@ -84,31 +95,38 @@ export default ar = {
     next: 'Next',
   
     // OTB screen screen
-    phoneVerification: 'Phone Verification',
+    phoneVerification: 'تحقق البريد الإلكتروني',
     enterYourCode: 'Enter your OTP code here',
     didntReceivedCode: "Didn't received any code ?",
     resendCode: 'Resend a new code.',
+    nextCode: 'التالي',
+    errorCode:'من فضلك إدخل 6 أرقام على الأقل.',
   
     //add address screen
     enterDetails: 'أدخل التفاصيل',
-    addressName: 'إسم الشارع',
+    addressName: 'إسم العنوان',
     floor: 'رقم الطابق',
     buildingNo: 'رقم المبني',
     city: 'المدينة',
     area: 'المنطقة',
     landmark: 'علامة مميزة',
     saveAddress: 'حفظ العنوان',
-    name: "العمل / المنزل",
+    name: "الشارع",
   
     //my addresses screen
     addNewAddress: 'إدخل عنوان جديد',
     noAddresses: 'لا توجد عناوين',
+    deleteAddress:'هل تريد ان تمسح هذا العنوان ؟',
   
     //menu
     relatedOffers: 'العروض',
     price: 'السعر:',
     confirmOrder: 'تأكيد الطلب',
     checkout: 'Checkout', //؟
+    exit:'هل تريد الخروج',
+    exitApp:'الخروج من التطبيق',
+    yes:'نعم',
+    no:'لا',
   
     //branchCard
     workingHours: 'ساعات العمل',
@@ -121,6 +139,7 @@ export default ar = {
   
     //profile screen
     save: 'حفظ',
+    cancel: 'إلغاء',
 
     //languageSwitcher
     arLang: 'العربية'

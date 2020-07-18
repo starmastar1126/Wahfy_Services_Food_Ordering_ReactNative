@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { FlatList, TouchableOpacity, View, Text, StyleSheet } from 'react-native';
+import { FlatList, TouchableOpacity, View, Text, StyleSheet, Alert } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { colors } from '../constants';
 import strings from '../strings';
@@ -8,7 +8,7 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { deleteAddress } from '../redux/actions';
 import { base_URL } from '../services/API';
-import {getAddresses} from '../redux/actions/AddressesAction'
+import { getAddresses } from '../redux/actions/AddressesAction'
 
 class MyAddresses extends Component {
   state = {
@@ -37,10 +37,47 @@ class MyAddresses extends Component {
     });
     const myAddresses = await request.json();
     const add = myAddresses.data
-    console.warn(add[0])
+    console.log('aaaaddddrrrreeess', myAddresses.data);
+
+    //console.warn(add[0])
     this.setState({ addresses: myAddresses.data });
   }
-
+  deleteAddress = async (id) => {
+    Alert.alert(
+      '',
+      strings.deleteAddress,
+      [
+        {
+          text: 'Cancel',
+          onPress: () => console.log('Cancel Pressed'),
+          style: 'cancel',
+        },
+        {
+          text: 'OK', onPress: async() => {
+            const { token } = this.props.user.data;
+            const {addresses} = this.state
+            const request = await fetch(`${base_URL}address/${id}`, {
+              method: 'DELETE',
+              headers: {
+                Authorization: token ? `Bearer ${token}` : '',
+                Accept: 'application/json',
+              },
+            });
+            await request.json().then(res => {
+              console.log('deleteAddress', res);
+              if (res.success == true) {
+                this.setState({ addresses: addresses.filter(item => item.id !== id) });
+              }
+              else if (res.success == false) {
+                Alert.alert('Failed to delete this address')
+              }
+            })
+          }
+        },
+      ],
+      {cancelable: true} 
+    );
+  }
 
   render() {
     const { buttonStyle } = styles;
@@ -85,6 +122,7 @@ class MyAddresses extends Component {
                   <AddressCard
                     item={item}
                     isSelected={isSelected}
+                    onPressDelete={() => this.deleteAddress(item.id)}
                     onPress={() => {
                       this.setState({ selectedAddressId: index });
                       this.props.navigation.navigate('Menu');

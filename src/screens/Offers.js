@@ -1,23 +1,45 @@
 import React, { Component } from 'react';
-import { FlatList, ActivityIndicator } from 'react-native';
+import { FlatList, ActivityIndicator, View } from 'react-native';
 import { OfferCard } from '../components/OfferCard';
+//import ListView from '../components/OfferCard';
+
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { getOffers } from '../redux/actions/OfferActions';
 import { colors } from '../constants';
 import AsyncStorage from '@react-native-community/async-storage';
+import { base_URL } from '../services/API';
+
 
 class Offers extends Component {
   // componentDidMount() {
   //   const {token} = this.props.user.data;
   //   this.props.getOffers({token});
   // }
+  state = {
+    loading: true,
+    dataOffers: null
+  }
   async componentDidMount() {
-    const token = await AsyncStorage.getItem('@TOKEN')
-    this.props.getOffers({ token });
+    //const token = await AsyncStorage.getItem('@TOKEN')
+    const { token } = this.props.user.data;
+    const data = {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        Accept: 'application/json'
+      }
+    };
+    const userResult = await fetch(`${base_URL}offers`, data);
+    await userResult.json().then(res => {
+      console.log(res.data.data);
+      this.setState({ loading: false, dataOffers: res.data.data })
+    });
+    //this.props.getOffers({ token });
   }
   render() {
-    const { offers, loading } = this.props;
+    const { dataOffers, loading } = this.state;
+    const { navigation } = this.props
     return (
       <>
         {loading ? (
@@ -27,13 +49,24 @@ class Offers extends Component {
             style={{ marginTop: 15 }}
           />
         ) : (
+            // <FlatList
+            //   style={{ paddingTop: 20 }}
+            //   data={dataOffers}
+            //   keyExtractor={(item) => item.id.toString()}
+            //   renderItem={({ item, index }) => (
+            //     <ListView
+            //       item={item}
+            //       index={index}
+            //       navigation={navigation}
+            //     />
+            //   )}
+            // />
             <FlatList
               style={{ paddingTop: 20 }}
-              data={offers[1]}
+              data={dataOffers}//offers[1]
               keyExtractor={(item, index) => index.toString()}
               renderItem={({ item }) => {
                 // console.log('buy_get', item.buy_get);
-
                 return (
                   <OfferCard
                     item={item}

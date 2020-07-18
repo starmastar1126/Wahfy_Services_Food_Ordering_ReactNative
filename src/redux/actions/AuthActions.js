@@ -49,7 +49,6 @@ export const signup = ({
     method: 'POST',
     headers: {
       Accept: 'application/json',
-      'Content-Type': 'application/json',
     },
     body: JSON.stringify({
       name,
@@ -61,10 +60,16 @@ export const signup = ({
   const request = await fetch(`${base_URL}auth/register`, formData);
   dispatch({type: START_LOADING});
   const user = await request.json();
+  console.log('uuuussseeer',user)
+  
   try {
     if (user) {
       dispatch({type: REGISTERSUCCESS, payload: user});
-      await AsyncStorage.setItem('@TOKEN', JSON.stringify(user.data.token));
+      // check if success got verification page
+      
+    
+    //console.log('uuuussseeer',user)
+    
       navigation.navigate('Home');
     } else {
       dispatch({type: REGISTERFAILED});

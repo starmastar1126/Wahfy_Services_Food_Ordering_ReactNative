@@ -1,7 +1,52 @@
-import React from 'react';
-import {View, Text, Image, TouchableOpacity, StyleSheet} from 'react-native';
+import React,{Component} from 'react';
+import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
 import strings from '../strings';
-import {colors} from '../constants/color';
+import { colors } from '../constants/color';
+
+// export default class OfferCard extends Component {
+//   render() {
+//     const { item } = this.props;
+//     const { id, image, title, price, description, type } = item;
+//     const {
+//       container,
+//       subContainer,
+//       menuImageStyle,
+//       titleStyle,
+//       typeText,
+//     } = styles;
+
+//     return (
+//       <TouchableOpacity
+//         key={id}
+//         style={container}
+//         >
+//         <Image source={{uri:image}} style={menuImageStyle} />
+//         <View style={subContainer}>
+//           <Text style={titleStyle}>{title}</Text>
+//           {price?<Text
+//             style={[
+//               titleStyle,
+//               {
+//                 fontSize: 13,
+//                 marginVertical: 5,
+//                 fontWeight: '600',
+//                 color: '#9c9c9c',
+//               },
+//             ]}>
+//             {strings.price} {price}
+//           </Text>:null}
+//           <Text
+//             numberOfLines={2}
+//             style={{ width: 200, fontSize: 12, color: '#b0b0b0' }}>
+//             {description}
+//           </Text>
+//           <Text style={typeText}>{type}</Text>
+//         </View>
+//         <View></View>
+//       </TouchableOpacity>
+//     );
+//   }
+// }
 
 export const OfferCard = props => {
   const {item, onPress} = props;
@@ -20,7 +65,7 @@ export const OfferCard = props => {
       key={id}
       style={container}
       onPress={onPress}>
-      <Image source={image} style={menuImageStyle} />
+      <Image source={{uri:image}} style={menuImageStyle} />
       <View style={subContainer}>
         <Text style={titleStyle}>{title}</Text>
         <Text

@@ -27,6 +27,7 @@ class ProductDetails extends Component {
   state = {
     toping: false,
     extras: [],
+    selectedProduct:[]
   };
 
   // async componentDidMount() {
@@ -37,7 +38,7 @@ class ProductDetails extends Component {
   addItemToCart(item) {
     item.extras = this.state.extras;
     // console.log('item', item);
-
+    //this.incermentCountButton(item)
     this.props.addToCart(item);
   }
 
@@ -68,12 +69,20 @@ class ProductDetails extends Component {
     }
     return false;
   }
+
+  incermentCountButton(productItem) {
+    //this.props.incermentCount(productItem);
+  }
+
   render() {
+    const { cart } = this.props;
+
     const {toping} = this.state;
     const {selectedProduct, extras} = this.props;
     const noExtras = extras.lenght == 0;
     const {productItem} = selectedProduct;
     const {image, name_en, price, calories} = productItem;
+    //const isExist = cart.includes(selectedProduct);
     const {
       headContainer,
       itemNameStyle,
@@ -86,6 +95,9 @@ class ProductDetails extends Component {
       confirmButtonStyle,
       countItemContainer,
       iconContainer,
+      increaseText,
+      decreaseText,
+      increasedecreaseContaioner
     } = styles;
     return (
       <View style={{flex: 1}}>
@@ -111,10 +123,21 @@ class ProductDetails extends Component {
           }}>
           <View style={{alignItems: 'center'}}>
             <Image source={image} style={productImageStyle} />
+            <View style={increasedecreaseContaioner}>
+            <TouchableOpacity 
+            onPress={()=>this.incermentCountButton(selectedProduct)}>
+              <Text style={increaseText}>+</Text>
+            </TouchableOpacity>
+            <TouchableOpacity>
+              <Text style={decreaseText}>_</Text>
+            </TouchableOpacity>
+            </View>
           </View>
           {/* here */}
         </View>
-        <View style={{alignSelf: 'center', marginTop: vScale(35)}}>
+        <View style={{height:'12%'}}/>
+
+        <View style={{alignSelf: 'center', marginTop: vScale(3)}}>
           <Text style={{color: '#BF2626'}}>
             {strings.calories} {calories}
           </Text>
@@ -188,6 +211,8 @@ class ProductDetails extends Component {
                           justifyContent: 'center',
                           marginHorizontal: hScale(10),
                           marginTop: vScale(10),
+                          position:'absolute',
+                          paddingTop:'11%'
                         }}
                         onPress={() =>
                           this.handleAddExtraToItem(
@@ -211,7 +236,7 @@ class ProductDetails extends Component {
           </>
         )}
         <Button
-          title={strings.addToCart}
+          title={strings.save}
           buttonStyle={confirmButtonStyle}
           onPress={() => {
             this.addItemToCart(productItem);
@@ -226,8 +251,7 @@ class ProductDetails extends Component {
 const styles = StyleSheet.create({
   headContainer: {
     width: '100%',
-    height: vScale(60),
-    marginTop: vScale(25),
+    paddingTop:'2%',
     paddingHorizontal: hScale(10),
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -240,9 +264,9 @@ const styles = StyleSheet.create({
     color: '#BF2626',
   },
   productImageStyle: {
-    width: hScale(140),
-    height: hScale(140),
-    borderRadius: hScale(70),
+    width: hScale(120),
+    height: hScale(120),
+    borderRadius: hScale(60),
   },
   addContainer: {
     position: 'absolute',
@@ -276,7 +300,7 @@ const styles = StyleSheet.create({
     borderRadius: hScale(40),
   },
   confirmButtonStyle: {
-    width: '80%',
+    width: '20%',
     height: vScale(45),
     backgroundColor: colors.buttonBG,
     position: 'absolute',
@@ -297,6 +321,41 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  increaseText:{
+    color:'#fff',
+    fontSize:30,
+    backgroundColor:'#000',
+    padding:15,
+    fontWeight:'bold',
+    paddingLeft:30,
+    paddingRight:30,
+    borderRadius:10,
+    borderBottomRightRadius:0,
+    borderBottomLeftRadius:0,
+    borderColor:'#fff',
+    borderWidth:1.5,
+    borderBottomWidth:0
+  },
+  decreaseText:{
+    color:'#000',
+    fontSize:30,
+    backgroundColor:'#fff',
+    padding:20,
+    paddingTop:0,
+    paddingBottom:30,
+    fontWeight:'bold',
+    borderRadius:10,
+    paddingLeft:30,
+    paddingRight:30,
+    borderTopRightRadius:0,
+    borderTopLeftRadius:0,
+    borderColor:'#000',
+    borderWidth:1,
+  },
+  increasedecreaseContaioner:{
+    position:'absolute',
+    top:'72%'
+  }
 });
 
 const mapStateToProps = ({cartReducer, productReducer, authReducer}) => {

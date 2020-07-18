@@ -32,15 +32,19 @@ export default en = {
     //screens name
     login: 'Login',
     signup: 'Sign up',
+    backToLogin:'Back To Login',
     verifyingNumber: 'VerifyingNumber',
-    phoneVerification: 'Phone Verification',
+    phoneVerification: 'Email Verification',
+    gotohome:'Go to Home',
     home: 'Home',
     addAddress: 'Add Address',
     cart: 'Cart',
     editAddress: 'Edit Address',
+    editProfile: 'Edit Profile',
     menu: 'Menu',
     myAddresses: 'My Addresses',
     myOrders: 'My Orders',
+    orderDetails: 'My Orders Details',
     offers: 'Offers',
     productDetails: 'Product Details',
     branches: 'Branches',
@@ -59,6 +63,7 @@ export default en = {
     //Intro screen
     login: 'Login',
     facebook: 'Facebook',
+    google: 'Google',
   
     //login screen
     welcomeBack: 'Welcome back',
@@ -66,6 +71,12 @@ export default en = {
     forgetPassword: 'Forget your password?',
     dontHaveAccount: 'Dont have account? ',
     signup: 'Sign up',
+    send: 'Send',
+    alertsend:'Please check your email to reset password',
+    errorMailmodal:"We can't find a user with that e-mail address.",
+
+    //Reset Password
+    resetPassword:'Reset Password',
   
     //signup screen
     createAccount: 'Create an account',
@@ -87,10 +98,12 @@ export default en = {
     next: 'Next',
   
     // OTB screen screen
-    phoneVerification: 'Phone Verification',
+    phoneVerification: 'Email Verification',
     enterYourCode: 'Enter your OTP code here',
     didntReceivedCode: "Didn't received any code ?",
     resendCode: 'Resend a new code.',
+    nextCode: 'Next',
+    errorCode:'Please enter at least 6 numbers.',
   
     //add address screen
     enterDetails: 'Enter Details',
@@ -102,18 +115,23 @@ export default en = {
     area: 'Area',
     landmark: 'Landmark',
     saveAddress: 'Save Address',
-    name: "Home / Work",
+    name: "Street",
   
     //my addresses screen
     addNewAddress: 'Add new address',
     noAddresses: 'No Addresses',
+    deleteAddress:'Do you want to delete this address?',
   
     //menu
     relatedOffers: 'Related offers',
     price: 'Price:',
     confirmOrder: 'Confirm Order',
     checkout: 'Checkout',
-  
+    exit:'Do you want to exit?',
+    exitApp:'Exit App',
+    yes:'Yes',
+    no:'No',
+
     //branchCard
     workingHours: 'Working hours',
     from: 'From:',
@@ -125,8 +143,11 @@ export default en = {
   
     //profile screen
     save: 'Save',
+    cancel: 'Cancel',
 
      //languageSwitcher
-     enLang: 'English'
+     enLang: 'English',
+
   };
+
   

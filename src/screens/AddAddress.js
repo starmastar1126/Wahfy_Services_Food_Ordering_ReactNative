@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, { Component } from 'react';
 import {
   View,
   Text,
@@ -6,15 +6,16 @@ import {
   ScrollView,
   TouchableOpacity,
 } from 'react-native';
-import {Input, Button} from '../components/common';
-import {colors} from '../constants';
+import { Input, Button } from '../components/common';
+import { colors } from '../constants';
 import strings from '../strings';
-import {Dropdown} from 'react-native-material-dropdown';
+import { Dropdown } from 'react-native-material-dropdown';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import {connect} from 'react-redux';
-import {bindActionCreators} from 'redux';
-import {newAddress} from '../redux/actions';
-import {base_URL} from '../services/API';
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
+import { newAddress } from '../redux/actions';
+import { base_URL } from '../services/API';
+import RNPickerSelect from 'react-native-picker-select';//here
 
 class AddAddress extends Component {
   state = {
@@ -24,13 +25,15 @@ class AddAddress extends Component {
     buildingNumber: '',
     landmark: '',
     cities: [],
+    city_Id: 1,
     areas: [],
+    area_Id: "10700001001",
     error: '',
     buttonLoading: false,
   };
 
-  static navigationOptions = ({navigation}) => ({
-    headerStyle: {backgroundColor: 'orange'},
+  static navigationOptions = ({ navigation }) => ({
+    headerStyle: { backgroundColor: 'orange' },
     headerRight: (
       <TouchableOpacity
         style={{
@@ -51,7 +54,9 @@ class AddAddress extends Component {
   }
 
   async getCitiesAndAreas() {
-    const {token} = this.props.user.data;
+    console.log(this.props.user);
+    
+    const { token } = this.props.user.data;
     const data = {
       method: 'GET',
       headers: {
@@ -66,7 +71,7 @@ class AddAddress extends Component {
     const cityId = cities.data[0].id;
     const areasResult = await fetch(`${base_URL}cities/${cityId}/areas`, data);
     const areas = await areasResult.json();
-    this.setState({cities: cities.data, areas});
+    this.setState({ cities: cities.data, areas });
   }
 
   validateAddressInputs(
@@ -77,20 +82,20 @@ class AddAddress extends Component {
     landmarkError,
   ) {
     if (nameError) {
-      this.setState({error: 'name'});
+      this.setState({ error: 'name' });
     } else if (streetError) {
-      this.setState({error: 'street'});
+      this.setState({ error: 'street' });
     } else if (floorNoError) {
-      this.setState({error: 'floor'});
+      this.setState({ error: 'floor' });
     } else if (buildingNoError) {
-      this.setState({error: 'building'});
+      this.setState({ error: 'building' });
     } else if (landmarkError) {
-      this.setState({error: 'landmark'});
+      this.setState({ error: 'landmark' });
     } else this.createAddress();
   }
 
   createAddress() {
-    const {token} = this.props.user.data;
+    const { token } = this.props.user.data;
     const {
       name,
       street,
@@ -99,16 +104,18 @@ class AddAddress extends Component {
       landmark,
       cities,
       areas,
+      city_Id,
+      area_Id
     } = this.state;
-    const {navigation} = this.props;
-    const cityId = cities.forEach(city => {
-      return city.id;
-    });
-    const areaId = areas.forEach(area => {
-      return area.id;
-    });
+    const { navigation } = this.props;
+    // const cityId = cities.forEach(city => {
+    //   return city.id;
+    // });
+    // const areaId = areas.forEach(area => {
+    //   return area.id;
+    // });
 
-    this.setState({buttonLoading: true});
+    this.setState({ buttonLoading: true });
 
     this.props.newAddress({
       name,
@@ -116,12 +123,12 @@ class AddAddress extends Component {
       building_number: buildingNumber,
       floor_number: floorNumber,
       landmark,
-      city_id: cityId || 1,
-      area_id: areaId || 1,
+      city_id: city_Id,
+      area_id: area_Id ,
       navigation,
       token,
     });
-    this.setState({buttonLoading: false});
+    this.setState({ buttonLoading: false });
   }
   render() {
     const {
@@ -132,9 +139,12 @@ class AddAddress extends Component {
       landmark,
       error,
       cities,
+      city_Id,
       areas,
+      area_Id,
       buttonLoading,
     } = this.state;
+
     const {
       headLineStyle,
       inputStyle,
@@ -151,11 +161,11 @@ class AddAddress extends Component {
       landMarkErrorText,
     } = strings.errorMessages;
 
-    const nameError = name.length == 0;
-    const isNameError = error === 'name';
-
-    const streetError = street.length == 0;
+    const streetError = street.length == 0;//address name
     const isStreetError = error === 'street';
+
+    const nameError = name.length == 0;//street
+    const isNameError = error === 'name';
 
     const floorNoError = floorNumber.length == 0;
     const isFloorNoError = error === 'floor';
@@ -167,11 +177,14 @@ class AddAddress extends Component {
     const isLandmarkError = error === 'landmark';
 
     const CitiesDropDownData = cities.map(city => ({
-      value: city.name_en,
+      //value: city.name_en,
+      label: city.name_en,
+      value: city.id
     }));
 
     const AreasDropDownData = areas.map(area => ({
-      value: area.name_en,
+      label:area.name_en,
+      value: `${area.id}`,
     }));
 
     // const cityId = cities[0].find(city => {
@@ -180,70 +193,120 @@ class AddAddress extends Component {
     // console.log('cityId', cityId)
 
     return (
-      <ScrollView contentContainerStyle={{marginTop: 15, flex: 1}}>
-        <View style={{flex: 1}}>
+      <ScrollView contentContainerStyle={{ marginTop: 15, flex: 1 }}>
+        <View style={{ flex: 1 }}>
           <Text style={enterDetailsText}>{strings.enterDetails}</Text>
           <View style={headLineStyle} />
           <Input
             containerStyle={inputStyle}
-            placeholder={strings.name}
-            placeholderTextColor={'gray'}
-            inputStyle={{fontSize: 15, marginStart: 0, width: '95%'}}
-            value={name}
-            onChangeText={name => this.setState({name, error: ''})}
-            errorMessage={isNameError && nameErrorText}
-          />
-          <Input
-            containerStyle={inputStyle}
             placeholder={strings.addressName}
             placeholderTextColor={'gray'}
-            inputStyle={{fontSize: 15, marginStart: 0}}
+            inputStyle={{ fontSize: 15, marginStart: 0 }}
             value={street}
-            onChangeText={street => this.setState({street, error: ''})}
+            onChangeText={street => this.setState({ street, error: '' })}
             errorMessage={isStreetError && streetErrorText}
           />
+          {/* <Dropdown
+            label={`${strings.city}`}
+            data={CitiesDropDownData}
+            containerStyle={collapseContainer}
+          /> */}
+          <RNPickerSelect
+            style={{
+              inputAndroid: {
+                width: '95%',
+                borderColor: '#e3e3e1',
+                borderWidth: 1,
+                borderRadius: 0,
+                fontSize: 15, 
+                margin: '2.5%',
+                marginTop:'0%',
+                paddingLeft:'3%',
+                backgroundColor: colors.white,
+                paddingHorizontal: 0,
+              }
+            }}
+            placeholder={{ label: `${strings.city}`, value: 1, color: 'grey' }}
+            placeholderTextColor='grey'
+            onValueChange={city_Id => this.setState({
+              city_Id
+            })}
+            items={CitiesDropDownData}
+            value={city_Id}
+            useNativeAndroidPickerStyle={false}
+          />
+          {/* <Dropdown
+            label={`${strings.area}`}
+            data={AreasDropDownData}
+            containerStyle={[collapseContainer, { marginTop: 8 }]}
+          /> */}
+          <RNPickerSelect
+            style={{
+              inputAndroid: {
+                width: '95%',
+                borderColor: '#e3e3e1',
+                borderWidth: 1,
+                borderRadius: 0,
+                fontSize: 15, 
+                margin: '2.5%',
+                marginTop:'0%',
+                marginBottom:'0%',
+                paddingLeft:'3%',
+                backgroundColor: colors.white,
+                paddingHorizontal: 0,
+              }
+            }}
+            placeholder={{ label: `${strings.area}`, value: "10700001001", color: 'grey' }}
+            placeholderTextColor='grey'
+            onValueChange={area_Id => this.setState({
+              area_Id
+            })}
+            items={AreasDropDownData}
+            value={area_Id}
+            useNativeAndroidPickerStyle={false}
+          />
+          <View style={{ paddingTop: '5%' }} />
           <Input
             containerStyle={inputStyle}
-            placeholder={strings.floor}
+            placeholder={strings.name}
             placeholderTextColor={'gray'}
-            inputStyle={{fontSize: 15, marginStart: 0}}
-            value={floorNumber}
-            onChangeText={floorNumber =>
-              this.setState({floorNumber, error: ''})
-            }
-            keyboardType="number-pad"
-            errorMessage={isFloorNoError && floorNoErrorText}
+            inputStyle={{ fontSize: 15, marginStart: 0, width: '95%' }}
+            value={name}
+            onChangeText={name => this.setState({ name, error: '' })}
+            errorMessage={isNameError && nameErrorText}
           />
           <Input
             containerStyle={inputStyle}
             placeholder={strings.buildingNo}
             placeholderTextColor={'gray'}
-            inputStyle={{fontSize: 15, marginStart: 0}}
+            inputStyle={{ fontSize: 15, marginStart: 0 }}
             value={buildingNumber}
             onChangeText={buildingNumber =>
-              this.setState({buildingNumber, error: ''})
+              this.setState({ buildingNumber, error: '' })
             }
             keyboardType="number-pad"
             errorMessage={isBuildingNoError && buildingNoErrorText}
           />
           <Input
             containerStyle={inputStyle}
+            placeholder={strings.floor}
+            placeholderTextColor={'gray'}
+            inputStyle={{ fontSize: 15, marginStart: 0 }}
+            value={floorNumber}
+            onChangeText={floorNumber =>
+              this.setState({ floorNumber, error: '' })
+            }
+            keyboardType="number-pad"
+            errorMessage={isFloorNoError && floorNoErrorText}
+          />
+          <Input
+            containerStyle={inputStyle}
             placeholder={strings.landmark}
             placeholderTextColor={'gray'}
-            inputStyle={{fontSize: 15, marginStart: 0}}
+            inputStyle={{ fontSize: 15, marginStart: 0 }}
             value={landmark}
-            onChangeText={landmark => this.setState({landmark, error: ''})}
+            onChangeText={landmark => this.setState({ landmark, error: '' })}
             errorMessage={isLandmarkError && landMarkErrorText}
-          />
-          <Dropdown
-            label="City"
-            data={CitiesDropDownData}
-            containerStyle={collapseContainer}
-          />
-          <Dropdown
-            label="Area"
-            data={AreasDropDownData}
-            containerStyle={[collapseContainer, {marginTop: 8}]}
           />
 
           <Button
@@ -307,9 +370,9 @@ const styles = StyleSheet.create({
   },
 });
 
-const mapStateToProps = ({authReducer}) => {
-  const {user} = authReducer;
-  return {user};
+const mapStateToProps = ({ authReducer }) => {
+  const { user } = authReducer;
+  return { user };
 };
 
 const mapDispatchToProps = dispatch => {

@@ -187,13 +187,9 @@ android {
 }
 
 dependencies {
-    implementation project(':react-native-localization')
-    implementation project(':@react-native-community_async-storage')
-    implementation project(':@react-native-community_geolocation')
-    implementation project(':react-native-vector-icons')
+    implementation 'com.facebook.android:facebook-android-sdk:[5,6)'
     implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation "com.facebook.react:react-native:+"  // From node_modules
-
     if (enableHermes) {
         def hermesPath = "../../node_modules/hermes-engine/android/";
         debugImplementation files(hermesPath + "hermes-debug.aar")
@@ -211,3 +207,5 @@ task copyDownloadableDepsToLibs(type: Copy) {
 }
 
 apply from: file("../../node_modules/@react-native-community/cli-platform-android/native_modules.gradle"); applyNativeModulesAppBuildGradle(project)
+
+apply plugin: 'com.google.gms.google-services'

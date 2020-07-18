@@ -2,7 +2,9 @@
   package="com.wahfyservices">
 
     <uses-permission android:name="android.permission.INTERNET" />
-
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <application
       android:name=".MainApplication"
       android:label="@string/app_name"
@@ -11,6 +13,8 @@
       android:allowBackup="false"
       android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
+            <meta-data android:name="com.facebook.sdk.ApplicationId" 
+            android:value="@string/facebook_app_id"/>
       <activity
         android:name=".MainActivity"
         android:label="@string/app_name"
@@ -22,6 +26,9 @@
         </intent-filter>
       </activity>
       <activity android:name="com.facebook.react.devsupport.DevSettingsActivity" />
+      <meta-data
+     android:name="com.google.android.geo.API_KEY"
+     android:value="AIzaSyDRZqh-GVZ0Ms8__Yvgzl7cu9iRx57vNDw"/>
     </application>
 
 </manifest>

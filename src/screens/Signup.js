@@ -1,13 +1,15 @@
-import React, {Component} from 'react';
-import {View, Text, StyleSheet, ScrollView} from 'react-native';
-import {Input, Button} from '../components/common';
-import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
-import {connect} from 'react-redux';
-import {bindActionCreators} from 'redux';
-import {signup} from '../redux/actions';
-import {colors} from '../constants';
+import React, { Component } from 'react';
+import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { Input, Button } from '../components/common';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
+import { signup } from '../redux/actions';
+import { colors } from '../constants';
 import strings from '../strings';
-import {isEmail, isPhoneNumber} from '../constants/validator';
+import { isEmail, isPhoneNumber } from '../constants/validator';
+import { base_URL } from '../services/API';
+import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 
 class Signup extends Component {
   state = {
@@ -17,7 +19,8 @@ class Signup extends Component {
     age: '',
     password: '',
     error: '',
-    buttonLoading: false
+    buttonLoading: false,
+    errorEmail: ''
   };
 
   validateSignupInputs({
@@ -27,26 +30,55 @@ class Signup extends Component {
     passwordError,
   }) {
     if (fullNameError) {
-      this.setState({error: 'fullname'});
+      this.setState({ error: 'fullname' });
     } else if (emailError) {
-      this.setState({error: 'email'});
+      this.setState({ error: 'email' });
     } else if (phoneNoError) {
-      this.setState({error: 'phone'});
+      this.setState({ error: 'phone' });
     } else if (passwordError) {
-      this.setState({error: 'password'});
+      this.setState({ error: 'password' });
     } else this.register();
   }
 
-  register() {
-    const {fullName, email, phone, password} = this.state;
-    const {navigation} = this.props;
-    this.props.signup({
-      name: fullName,
-      email,
-      phone,
-      password,
-      navigation,
+  async register() {
+    const { fullName, email, phoneNo, password } = this.state;
+    const { navigation } = this.props;
+    const data = {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        email,
+        name: fullName,
+        phone: phoneNo,
+        password,
+      }),
+    };
+    const userResult = await fetch(`${base_URL}auth/register`, data);
+    await userResult.json().then(res => {
+      console.log('signsign', res);
+      if (res.error) {
+        if(res.error.email){
+        this.setState({ errorEmail: res.error.email });
+        }
+      }
+      else {
+        navigation.navigate({
+          routeName: 'PhoneV',
+          params: {
+            EmailSignUpParam: email
+          }
+        })
+      }
     });
+    // this.props.signup({
+    //   name: fullName,
+    //   email,
+    //   phone,
+    //   password,
+    //   navigation,
+    // });
   }
 
   render() {
@@ -63,7 +95,8 @@ class Signup extends Component {
       password,
       error,
       age,
-      buttonLoading
+      buttonLoading,
+      errorEmail
     } = this.state;
 
     const { loading } = this.props
@@ -99,52 +132,54 @@ class Signup extends Component {
           contentContainerStyle={inputsContainer}
           behavior="padding">
           <Text style={welcomeBackText}>{strings.createAccount}</Text>
+          {errorEmail ? <Text style={{ margin: 10, fontSize: hp('2.5%'), color: 'red', textAlign: 'center' }}>{errorEmail}</Text> : null}
           <Input
             placeholder={strings.fullName}
             placeholderTextColor={colors.placeholder}
-            inputStyle={{fontSize: 18}}
+            inputStyle={{ fontSize: 18 }}
             value={fullName}
-            onChangeText={fullName => this.setState({fullName, error: ''})}
+            onChangeText={fullName => this.setState({ fullName, error: '' })}
             errorMessage={isNameError && nameErrorText}
           />
           <Input
             placeholder={strings.email}
             placeholderTextColor={colors.placeholder}
-            inputStyle={{fontSize: 18}}
+            inputStyle={{ fontSize: 18 }}
             value={email}
-            onChangeText={email => this.setState({email, error: ''})}
+            onChangeText={email => this.setState({ email, error: '',errorEmail:'' })}
             errorMessage={isEmailError && emailErrorText}
           />
           <Input
             placeholder={strings.phone}
             placeholderTextColor={colors.placeholder}
-            inputStyle={{fontSize: 18}}
+            inputStyle={{ fontSize: 18 }}
             value={phoneNo}
             keyboardType="phone-pad"
-            onChangeText={phoneNo => this.setState({phoneNo, error: ''})}
+            onChangeText={phoneNo => this.setState({ phoneNo, error: '' })}
             errorMessage={isPhoneNoError && phoneNoErrorText}
           />
           <Input
             placeholder={strings.age}
             placeholderTextColor={colors.placeholder}
-            inputStyle={{fontSize: 18}}
+            inputStyle={{ fontSize: 18 }}
+            keyboardType='numeric'
             value={age}
-            onChangeText={age => this.setState({age, error: ''})}
+            onChangeText={age => this.setState({ age, error: '' })}
           />
           <Input
             placeholder={strings.password}
             placeholderTextColor={colors.placeholder}
-            inputStyle={{fontSize: 18}}
+            inputStyle={{ fontSize: 18 }}
             secureTextEntry
             value={password}
-            onChangeText={password => this.setState({password, error: ''})}
+            onChangeText={password => this.setState({ password, error: '' })}
             errorMessage={isPasswordError && passwordErrorText}
           />
 
           <Button
             title={strings.signup}
             loading={buttonLoading}
-            buttonStyle={{width: '85%'}}
+            buttonStyle={{ width: '85%' }}
             onPress={() =>
               this.validateSignupInputs({
                 fullNameError,

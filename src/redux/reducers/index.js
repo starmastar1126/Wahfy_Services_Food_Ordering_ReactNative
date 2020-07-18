@@ -5,7 +5,7 @@ import AddressesReducer from './AddressesReducer';
 import BranchesReducer from './BranchesReducer';
 import OfferReducer from './OfferReducer';
 import ProductReducer from './ProductReducer';
-
+import getUserDatareducer from './getUserDatareducer'
 
 export default combineReducers({
     authReducer: AuthReducer,
@@ -13,5 +13,6 @@ export default combineReducers({
     addressReducer: AddressesReducer,
     branchesReducer: BranchesReducer,
     offersReducer: OfferReducer,
-    productReducer: ProductReducer
+    productReducer: ProductReducer,
+    getuserdataReducer: getUserDatareducer
 })

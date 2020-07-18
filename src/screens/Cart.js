@@ -39,7 +39,7 @@ class Cart extends Component {
   handleDecrementCount(item, cart, qty, isExist) {
     this.props.decermentCount(item, cart);
     this.forceUpdateHandler();
-    if (isExist && qty < 1) {
+    if (isExist && qty < 2) {
       this.props.removeFromCart(item.product.id);
       this.forceUpdateHandler();
     }
@@ -418,7 +418,7 @@ const styles = StyleSheet.create({
 
 const mapStateToProps = ({ cartReducer }) => {
   const { cart } = cartReducer;
-  // console.log('carrrrrrr', cart);
+  console.log('carrrrrrr', cart);
 
   return { cart };
 };

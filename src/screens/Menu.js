@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, { Component } from 'react';
 import {
   StyleSheet,
   View,
@@ -9,12 +9,16 @@ import {
   ScrollView,
   ActivityIndicator,
   I18nManager,
+  Dimensions,
+  BackHandler,
+  Alert
 } from 'react-native';
 import strings from '../strings';
-import {images} from '../assets';
+import { images } from '../assets';
 import Swiper from 'react-native-swiper';
-import {connect} from 'react-redux';
-import {bindActionCreators} from 'redux';
+import ImageSlider from 'react-native-image-slider';
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
 import {
   addToCart,
   removeFromCart,
@@ -23,11 +27,11 @@ import {
   get_product,
   getExtras,
 } from '../redux/actions/CartActions';
-import {hScale, vScale, fScale, sWidth} from 'step-scale';
-import {colors} from '../constants';
+import { hScale, vScale, fScale, sWidth, crScale } from 'step-scale';
+import { colors } from '../constants';
 import AsyncStorage from '@react-native-community/async-storage';
 
-const {isRTL} = I18nManager;
+const { isRTL } = I18nManager;
 
 class Menu extends Component {
   state = {
@@ -37,7 +41,25 @@ class Menu extends Component {
     screenLoading: true,
     catId: 1,
   };
-
+  componentWillMount() {
+    BackHandler.addEventListener('hardwareBackPress', this.backPressed);
+ }
+ 
+ componentWillUnmount() {
+    BackHandler.removeEventListener('hardwareBackPress', this.backPressed);
+ }
+ 
+ backPressed = () => {
+   Alert.alert(
+     strings.exitApp,
+     strings.exit,
+     [
+       {text: strings.no, onPress: () => console.log('Cancel Pressed'), style: 'cancel'},
+       {text: strings.yes, onPress: () => BackHandler.exitApp()},
+     ],
+     { cancelable: false });
+     return true;
+ }
   componentDidMount(id) {
     this.getCategories();
     this.getMenuItems(id);
@@ -45,14 +67,13 @@ class Menu extends Component {
 
   async getCategories() {
     const token = await AsyncStorage.getItem('@TOKEN');
-    this.props.fetchCategories({token});
+    this.props.fetchCategories({ token });
   }
 
-  async getMenuItems(id) {
-    const token = await AsyncStorage.getItem('@TOKEN');
+  getMenuItems(id) {
     const catId = id || 1;
-    this.props.getMenu({catId});
-    this.props.getExtras({catId});
+    this.props.getMenu({ catId });
+    this.props.getExtras({ catId });
   }
 
   handleSelectedProduct(item) {
@@ -61,6 +82,21 @@ class Menu extends Component {
 
   addItemToCart(item) {
     this.props.addToCart(item);
+  }
+
+  renderCategoryItem = ({ item }) => {
+    const { id, image, name_en } = item;
+    const { categoryItemContanier, categoryImageView, categoryImage, categoryTitle } = styles;
+    return (
+      <TouchableOpacity onPress={() => this.getMenuItems(id)}>
+        <View style={categoryItemContanier}>
+          <View style={categoryImageView}>
+            <Image style={categoryImage} source={{ uri: image }} />
+          </View>
+          <Text style={categoryTitle}>{name_en}</Text>
+        </View>
+      </TouchableOpacity>
+    )
   }
 
   render() {
@@ -81,7 +117,11 @@ class Menu extends Component {
           'https://images.unsplash.com/photo-1484723091739-30a097e8f929?ixlib=rb-1.2.1&auto=format&fit=crop&w=400&q=60',
       },
     ];
-
+    const swiperImages2 = [
+      require('../assets/images/slider1.jpg'),
+      require('../assets/images/slider2.jpg'),
+      require('../assets/images/slider3.jpg'),
+    ]
     const {
       container,
       bannerContainer,
@@ -89,7 +129,6 @@ class Menu extends Component {
       itemContainer,
       menuContainer,
       menuTextStyle,
-      itemImageStyle,
       titleStyle,
       menuItemContainer,
       buttonStyle,
@@ -97,8 +136,9 @@ class Menu extends Component {
       menuListStyle,
       relatedItemContainer,
       relatedItemImageStyle,
+      categoriesView
     } = styles;
-    const {categories, cart, loading, subCategory} = this.props;
+    const { categories, cart, loading, subCategory } = this.props;
     return (
       <ScrollView
         style={container}
@@ -111,12 +151,12 @@ class Menu extends Component {
           <ActivityIndicator
             size="large"
             color={colors.buttonBG}
-            style={{marginTop: 15}}
+            style={{ marginTop: 15 }}
           />
         ) : (
-          <>
-            <View style={bannerContainer}>
-              <Swiper
+            <>
+              <View style={bannerContainer}>
+                {/* <Swiper
                 width={'100%'}
                 height={'25%'}
                 autoplay
@@ -132,84 +172,69 @@ class Menu extends Component {
                     />
                   );
                 })}
-              </Swiper>
-            </View>
+              </Swiper> */}
+                <ImageSlider autoPlayWithInterval={3000}
+                  images={swiperImages2} />
+              </View>
 
-            <FlatList
-              style={{marginTop: 5}}
-              contentContainerStyle={{
-                paddingHorizontal: 5,
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-              showsHorizontalScrollIndicator={false}
-              data={categories[0]}
-              keyExtractor={(item, index) => index.toString()}
-              horizontal
-              renderItem={({item}) => {
-                const {id, image, name_en} = item;
-                const hasImage = image != null;
-                return (
-                  <TouchableOpacity onPress={() => this.getMenuItems(id)}>
-                    {hasImage ? (
-                      <Image source={{uri: image}} style={itemImageStyle} />
-                    ) : (
-                      <Image source={images.food_1} style={itemImageStyle} />
-                    )}
-                    <Text style={titleStyle}>{name_en}</Text>
-                  </TouchableOpacity>
-                );
-              }}
-            />
-            <View style={[menuContainer, isRTL && {alignItems: 'flex-start'}]}>
-              <Text style={[menuTextStyle]}>{strings.menu}</Text>
-            </View>
-            {/* menu list */}
-            <FlatList
-              style={menuListStyle}
-              contentContainerStyle={{paddingHorizontal: hScale(10)}}
-              showsVerticalScrollIndicator={false}
-              data={subCategory[1]}
-              keyExtractor={(item, index) => index.toString()}
-              renderItem={({item}) => {
-                const {id, image, name_en, price, description_en} = item;
-                return (
-                  <TouchableOpacity
-                    key={id}
-                    style={menuItemContainer}
-                    onPress={() => {
-                      this.handleSelectedProduct(item);
-                      this.props.navigation.navigate('ProductDetails');
-                    }}>
-                    <Image source={{uri: image}} style={menuImageStyle} />
+              <FlatList
+              style={categoriesView}
+                showsHorizontalScrollIndicator={false}
+                data={categories[0]}
+                keyExtractor={(item, index) => index.toString()}
+                horizontal
+                renderItem={this.renderCategoryItem}
+              />
 
-                    <View
-                      style={{
-                        alignItems: 'flex-start',
-                        justifyContent: 'flex-start',
-                      }}>
-                      <Text style={titleStyle}>{name_en}</Text>
-                      <Text style={titleStyle}>
-                        {strings.price} {price}
-                      </Text>
-                      <Text numberOfLines={2} style={{width: hScale(110)}}>
-                        {description_en}
-                      </Text>
-                    </View>
-
+              <View style={[menuContainer, isRTL && { alignItems: 'flex-start' }]}>
+                <Text style={[menuTextStyle]}>{strings.menu}</Text>
+              </View>
+              {/* menu list */}
+              <FlatList
+                style={menuListStyle}
+                contentContainerStyle={{ paddingHorizontal: hScale(10) }}
+                showsVerticalScrollIndicator={false}
+                data={subCategory[1]}
+                keyExtractor={(item, index) => index.toString()}
+                renderItem={({ item }) => {
+                  const { id, image, name_en, price, description_en } = item;
+                  return (
                     <TouchableOpacity
-                      style={buttonStyle}
-                      onPress={() => this.addItemToCart(item)}>
-                      <Text style={{color: colors.white}}>
-                        {strings.addToCart}
-                      </Text>
+                      key={id}
+                      style={menuItemContainer}
+                      onPress={() => {
+                        this.handleSelectedProduct(item);
+                        this.props.navigation.navigate('ProductDetails');
+                      }}>
+                      <Image source={{ uri: image }} style={menuImageStyle} />
+
+                      <View
+                        style={{
+                          alignItems: 'flex-start',
+                          justifyContent: 'flex-start',
+                        }}>
+                        <Text style={titleStyle}>{name_en}</Text>
+                        <Text style={titleStyle}>
+                          {strings.price} {price}
+                        </Text>
+                        <Text numberOfLines={2} style={{ width: hScale(110) }}>
+                          {description_en}
+                        </Text>
+                      </View>
+
+                      <TouchableOpacity
+                        style={buttonStyle}
+                        onPress={() => this.addItemToCart(item)}>
+                        <Text style={{ color: colors.white }}>
+                          {strings.addToCart}
+                        </Text>
+                      </TouchableOpacity>
                     </TouchableOpacity>
-                  </TouchableOpacity>
-                );
-              }}
-            />
-            {/* related list */}
-            {/* <View style={{height: vScale(150)}}>
+                  );
+                }}
+              />
+              {/* related list */}
+              {/* <View style={{height: vScale(150)}}>
               <Text
                 style={[
                   relatedItemContainer,
@@ -236,22 +261,22 @@ class Menu extends Component {
                 }}
               />
             </View> */}
-          </>
-        )}
+            </>
+          )}
       </ScrollView>
     );
   }
 }
 
-
+const { width } = Dimensions.get('window');
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     width: sWidth,
   },
   bannerContainer: {
-    width: '100%',
-    height: '25%',
+    width,
+    height: 250
   },
   bannerStyle: {
     width: '100%',
@@ -268,17 +293,9 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   itemImageStyle: {
-    width: hScale(110),
-    height: vScale(80),
-    marginHorizontal: hScale(10),
-    borderBottomLeftRadius: vScale(15),
-    borderBottomRightRadius: vScale(15),
-  },
-  titleStyle: {
-    fontSize: fScale(15),
-    fontWeight: 'bold',
-    textAlign: 'center',
-    marginTop: vScale(5),
+    height: 150,
+    width: 100,
+    marginLeft: 10
   },
   menuItemContainer: {
     flexDirection: 'row',
@@ -293,12 +310,12 @@ const styles = StyleSheet.create({
     resizeMode: 'cover',
   },
   buttonStyle: {
-    width: hScale(100),
+    width: hScale(60),
     height: vScale(40),
     backgroundColor: 'orange',
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: hScale(30),
+    borderRadius: hScale(10),
   },
   menuListStyle: {
     marginTop: vScale(5),
@@ -314,14 +331,49 @@ const styles = StyleSheet.create({
     width: hScale(180),
     height: vScale(80),
     marginHorizontal: hScale(10),
-    borderRadius: hScale(15),
+    borderRadius: hScale(15)
+  },
+  categoriesView: {
+    width,
+    marginTop: 10,
+    paddingTop: 2,
+    borderTopColor: 'gray',
+    borderTopWidth: 1
+  },
+  categoryItemContanier: {
+    width: 150,
+    marginLeft: 5,
+    marginRight: 5,
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  categoryImageView:{
+    height: 90,
+    width: 140,
+    borderWidth: 1,
+    borderColor: "grey",
+    borderBottomLeftRadius: 20,
+    borderBottomRightRadius: 20,
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  categoryImage: {
+    height: 80,
+    width: 120,
+    borderRadius: 10
+  },
+  categoryTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginTop: 5
   },
 });
 
-const mapStateToProps = ({cartReducer}) => {
-  const {cart, categories, subCategory} = cartReducer;
+const mapStateToProps = ({ cartReducer }) => {
+  const { cart, categories, subCategory } = cartReducer;
 
-  return {cart, categories, subCategory};
+  return { cart, categories, subCategory };
 };
 
 const mapDispatchToProps = dispatch => {

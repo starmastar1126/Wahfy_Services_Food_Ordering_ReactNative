@@ -11,7 +11,9 @@ import ProductDetails from '../screens/ProductDetails';
 import  strings  from '../strings';
 import { colors } from '../constants';
 import Profile from '../screens/Profile';
+import EditProfile from '../screens/EditProfile'
 import OffersMenu from '../screens/OffersMenu';
+import OrderDetails from '../screens/OrderDetails'
 import { LangSwitcher } from '../screens/LanguageSwitcher';
 
 export const MainStack = createStackNavigator({
@@ -68,6 +70,22 @@ export const MainStack = createStackNavigator({
       headerTitle: strings.profile,
     }),
   },
+  EditProfile: {
+    screen: EditProfile,
+    navigationOptions: ({navigation}) => ({
+      headerStyle: {backgroundColor: 'orange'},
+      headerTintColor: colors.white,
+      headerTitle: strings.editProfile,
+    }),
+  },
+  OrderDetails: {
+    screen: OrderDetails,
+    navigationOptions: ({navigation}) => ({
+      headerStyle: {backgroundColor: 'orange'},
+      headerTintColor: colors.white,
+      headerTitle: strings.orderDetails,
+    })
+},
   LanguageSwitcher: {
     screen: LangSwitcher,
     navigationOptions: ({navigation}) => ({

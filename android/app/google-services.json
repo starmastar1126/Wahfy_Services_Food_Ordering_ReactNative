@@ -1,0 +1,69 @@
+{
+  "project_info": {
+    "project_number": "847338080093",
+    "firebase_url": "https://nbaapp-e9769.firebaseio.com",
+    "project_id": "nbaapp-e9769",
+    "storage_bucket": "nbaapp-e9769.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:847338080093:android:cb9363155261caed90cab4",
+        "android_client_info": {
+          "package_name": "com.be"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "847338080093-6qjdfdl3ooqbmg84qk7ed6el3b99dbrs.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCiXwaBofSVJ_byymOq4IBqQCCbqAp8kWc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "847338080093-6qjdfdl3ooqbmg84qk7ed6el3b99dbrs.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:847338080093:android:9846bf108771d85490cab4",
+        "android_client_info": {
+          "package_name": "com.wahfyservices"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "847338080093-6qjdfdl3ooqbmg84qk7ed6el3b99dbrs.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCiXwaBofSVJ_byymOq4IBqQCCbqAp8kWc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "847338080093-6qjdfdl3ooqbmg84qk7ed6el3b99dbrs.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
